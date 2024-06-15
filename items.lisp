@@ -1,4 +1,5 @@
 (load "utilities.lisp")
+(load "character.lisp")
 (defparameter *items* nil)
 
 (defstruct item
@@ -12,9 +13,9 @@
   weight
   wield)
 
-(defmethod use-item ((user rpg-character) (target rpg-character) item))
+(defmethod perform-action ((user rpg-character) (target rpg-character) (item item)))
 
-(defmethod can-equip ((user rpg-character) item)
+(defmethod can-equip ((user rpg-character) (item item))
   (and (>= (rpg-character-agility user)      (item-agility-requirement item))
        (>= (rpg-character-intelligence user) (item-intelligence-requirement item))
        (>= (rpg-character-strength user)     (item-strength-requirement item))))
@@ -37,7 +38,7 @@
                                       (range ,range)
                                       (weight ,weight)
                                       (wield ,wield))))
-    (defmethod use-item ((user rpg-character) (target rpg-character) (item ,item-name))
+    (defmethod perform-action ((user rpg-character) (target rpg-character) (item ,item-name))
       ,@body)
     (pushnew ',item-name *items*)))
 
