@@ -33,8 +33,7 @@
       ,@body)
     (pushnew (make-instance-from-name ',name) *spells* :test (lambda (x y) (equal (spell-name x) (spell-name y))))))
 
-(define-spell chill-wind 8 12 20 3 "arcane" 1 "Stamina damage only. If this attack reduces stamina to 0 the targets next rest action restores half the normal stamina"
-  )
+(define-spell chill-wind 8 12 20 3 "arcane" 1 "Stamina damage only. If this attack reduces stamina to 0 the targets next rest action restores half the normal stamina")
 (define-spell lesser-fireball 8 12 40 1 "arcane" 0 "A small flash of fire erupts at a point that the caster can see")
 (define-spell arcane-compose 8 0 0 0 "arcane" 0 "Reduces HP to gain Stamina")
 (define-spell lesser-heal 10 8 0 0 "divine" 0 "Reduces stamina to gain hp")

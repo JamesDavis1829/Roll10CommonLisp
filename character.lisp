@@ -2,15 +2,15 @@
 (load "dice.lisp")
 
 (defstruct rpg-character
-  (agility 5)
-  (intelligence 5)
-  (stamina 5)
-  (strength 5)
-  (durability 5)
-  (insight 5)
+  (agility *base-stat*)
+  (intelligence *base-stat*)
+  (stamina *base-stat*)
+  (strength *base-stat*)
+  (durability *base-stat*)
+  (insight *base-stat*)
 
-  (cur-hp 5)
-  (cur-sta 5)
+  (cur-hp *base-stat*)
+  (cur-sta *base-stat*)
   actions
   (caster-type "none")
   equipment
@@ -40,6 +40,18 @@
 (defmethod is-dead ((character rpg-character))
   (when (= (rpg-character-cur-hp character) 0)
     t))
+
+(defmethod agi-mod ((c rpg-character))
+  (let ((mod (max 0 (- (rpg-character-agility c) *base-stat*))))
+    (list mod (format nil "~A" mod) "AGI")))
+
+(defmethod str-mod ((c rpg-character))
+  (let ((mod (max 0 (- (rpg-character-strength c) *base-stat*))))
+    (list mod (format nil "~A" mod) "STR")))
+
+(defmethod dur-mod ((c rpg-character))
+  (let ((mod (max 0 (- (rpg-character-durability c) *base-stat*))))
+    (list mod (format nil "~A" mod) "DUR")))
 
 (defmacro define-rpg-character (name level agi int sta str dur ins &key actions equipment feats inventory spells caster-type)
   (progn

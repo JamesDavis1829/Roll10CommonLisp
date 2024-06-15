@@ -45,25 +45,77 @@
 (defun random-item ()
   (make-instance-from-name (nth (random (length *items*)) *items*)))
 
-(define-item dagger 6 6 6 1 "light" 1 "weapon")
-(define-item short-sword 10 9 10 1 "light" 1 "weapon")
-(define-item warhammer 10 8 12 1 "heavy" 2 "weapon")
-(define-item shield 8 6 8 0 "medium" 1 "armor")
-(define-item gambeson 6 6 8 0 "light" 0 "armor")
-(define-item chain-shirt 6 4 8 0 "medium" 0 "armor")
-(define-item natural-armor 0 0 0 0 "light" 0 "armor")
-(define-item scale-mail 0 0 12 0 "heavy" 0 "armor")
-(define-item war-axe 8 8 12 1 "heavy" 1 "weapon")
-(define-item zweihander 10 9 10 2 "medium" 2 "weapon")
-(define-item whip 11 9 8 1 "light" 1 "weapon")
-(define-item short-spear 9 6 9 1 "medium" 1 "weapon")
-(define-item spear 9 6 9 2 "medium" 2 "weapon")
-(define-item polearm 11 9 11 3 "medium" 2 "weapon")
-(define-item short-bow 8 8 10 20 "light" 2 "weapon")
-(define-item long-bow 8 8 12 20 "medium" 2 "weapon")
-(define-item crossbow 10 9 10 20 "medium" 2 "weapon")
-(define-item heavy-crossbow 10 9 11 30 "heavy" 2 "weapon")
-(define-item hand-crossbow 10 9 8 10 "light" 1 "weapon")
+(defmacro gen-combat-roll (sta-cost &rest rolls)
+  `(if (>= (- (rpg-character-cur-sta user) ,sta-cost) 0)
+     (let* ((rolls (list ,@rolls))
+            (roll-damage (max 0 (apply #'+ (mapcar #'first rolls)))))
+       (decf (rpg-character-cur-sta user) ,sta-cost)
+       (damage target roll-damage)
+       (list roll-damage (format nil "~{~A~^ + ~} = ~A" (mapcar #'second rolls) roll-damage) (format nil "~{~A~^ + ~}" (mapcar #'third rolls))))
+     nil))
+
+(define-item dagger 6 6 6 1 "light" 1 "weapon"
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 6) (agi-mod user)))
+
+(define-item short-sword 10 9 10 1 "light" 1 "weapon"
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 6) (str-mod user) (agi-mod user)))
+
+(define-item warhammer 10 8 12 1 "heavy" 2 "weapon"
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 8) (str-mod user) (agi-mod user)))
+
+(define-item longsword 10 9 10 1 "heavy" 1 "weapon"
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 8) (str-mod user) (agi-mod user)))
+
+(define-item shield 8 6 8 0 "medium" 1 "armor"
+  (gen-combat-roll 0 (const 2)))
+
+(define-item gambeson 6 6 8 0 "light" 0 "armor"
+  (gen-combat-roll 0 (const 1)))
+
+(define-item chain-shirt 6 4 8 0 "medium" 0 "armor"
+  (gen-combat-roll 0 (const 3)))
+
+(define-item natural-armor 0 0 0 0 "light" 0 "armor"
+  (gen-combat-roll 0 (dur-mod user)))
+
+(define-item weapon-guard 0 0 0 0 "light" 1 "armor"
+  (gen-combat-roll 0 (const 1)))
+
+(define-item scale-mail 0 0 12 0 "heavy" 0 "armor"
+  (gen-combat-roll 0 (const 4)))
+
+(define-item war-axe 8 8 12 1 "heavy" 1 "weapon"
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 8) (str-mod user)))
+
+(define-item zweihander 10 9 10 2 "medium" 2 "weapon"
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 8) (str-mod user) (agi-mod user)))
+
+(define-item whip 11 9 8 3 "light" 1 "weapon"
+  (gen-combat-roll 1 (roll 1 10) (roll 1 4) (agi-mod user)))
+
+(define-item short-spear 9 6 9 1 "medium" 1 "weapon"
+  (gen-combat-roll 1 (roll 1 10) (roll 1 6) (str-mod user)))
+
+(define-item spear 9 6 9 2 "medium" 2 "weapon"
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 8) (str-mod user) (agi-mod user)))
+
+(define-item polearm 11 9 11 3 "medium" 2 "weapon"
+  (gen-combat-roll 1 (roll-die 2 10) (str-mod user)))
+
+(define-item short-bow 8 8 10 20 "light" 2 "weapon"
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 6) (agi-mod user)))
+
+(define-item long-bow 8 8 12 20 "medium" 2 "weapon"
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 8) (agi-mod user)))
+
+(define-item crossbow 10 9 10 20 "medium" 2 "weapon"
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 8) (agi-mod user)))
+
+(define-item heavy-crossbow 10 9 11 30 "heavy" 2 "weapon"
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 2 6) (agi-mod user)))
+
+(define-item hand-crossbow 10 9 8 10 "light" 1 "weapon"
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 4) (agi-mod user)))
 (define-item club 6 4 10 1 "medium" 1 "weapon")
 (define-item brigadine 8 6 11 0 "heavy" 0 "armor")
 (define-item plate 8 6 12 0 "heavy" 0 "armor")
