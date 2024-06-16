@@ -1,5 +1,5 @@
 (load "utilities.lisp")
-(load "character.lisp")
+(load "base.lisp")
 (defparameter *items* ())
 
 (defstruct item
@@ -14,6 +14,12 @@
   wield)
 
 (defmethod perform-action ((user rpg-character) (target rpg-character) (item item)))
+
+(defmethod armor-mod ((c rpg-character))
+  (let* ((equiped-armor (remove-if-not (lambda (x) (equal (item-category x) "armor")) (rpg-character-equipment c)))
+         (armor-values (mapcar (lambda (armor-item) (first (perform-action c c armor-item))) equiped-armor))
+         (total-armor (apply '+ armor-values)))
+    (list total-armor (write-to-string total-armor) "ARMOR")))
 
 (defmethod can-equip ((user rpg-character) (item item))
   (and (>= (rpg-character-agility user)      (item-agility-requirement item))

@@ -1,5 +1,4 @@
 (defparameter *base-dice* 10)
-(defparameter *base-stat* 8)
 
 (defun roll-die (number sides)
   (let ((rolls (loop for x below number collect (+ (random sides) 1)))

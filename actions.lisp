@@ -1,5 +1,6 @@
 (load "utilities.lisp")
-(load "character.lisp")
+(load "base.lisp")
+
 (defparameter *actions* ())
 
 (defstruct action
