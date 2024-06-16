@@ -41,17 +41,32 @@
   (when (= (rpg-character-cur-hp character) 0)
     t))
 
-(defmethod agi-mod ((c rpg-character))
-  (let ((mod (max 0 (- (rpg-character-agility c) *base-stat*))))
-    (list mod (format nil "~A" mod) "AGI")))
+(defmacro gen-mod (fun-name slot-name)
+  `(defmethod ,fun-name ((c rpg-character))
+     (let ((mod (max 0 (- (funcall (read-from-string (format nil "rpg-character-~a" ',slot-name)) c) *base-stat*))))
+       (list mod (write-to-string mod) (subseq (string-upcase ',slot-name) 0 3)))))
 
-(defmethod str-mod ((c rpg-character))
-  (let ((mod (max 0 (- (rpg-character-strength c) *base-stat*))))
-    (list mod (format nil "~A" mod) "STR")))
+(gen-mod agi-mod agility)
+(gen-mod str-mod strength)
+(gen-mod dur-mod durability)
+(gen-mod sta-mod stamina)
+(gen-mod ins-mod insight)
+(gen-mod int-mod intelligence)
 
-(defmethod dur-mod ((c rpg-character))
-  (let ((mod (max 0 (- (rpg-character-durability c) *base-stat*))))
-    (list mod (format nil "~A" mod) "DUR")))
+(defmethod caster-mod ((c rpg-character))
+  (let ((caster-type (rpg-character-caster-type c)))
+    (concatenate 'list
+                 (cond
+                   ((equal caster-type "quarter") (list 1 "1"))
+                   ((equal caster-type "half") (list 2 "2"))
+                   ((equal caster-type "full") (list 3 "3"))
+                   (t (list 0 "0"))) '("CASTERMOD"))))
+
+(defmethod armor-mod ((c rpg-character))
+  (let* ((equiped-armor (remove-if-not (lambda (x) (equal (item-category x) "armor")) (rpg-character-equipment c)))
+         (armor-values (mapcar (lambda (armor-item) (first (perform-action c c armor-item))) equiped-armor))
+         (total-armor (apply '+ armor-values)))
+    (list total-armor (write-to-string total-armor) "ARMOR")))
 
 (defmacro define-rpg-character (name level agi int sta str dur ins &key actions equipment feats inventory spells caster-type)
   (progn
@@ -72,3 +87,12 @@
                                 (level ,level)
                                 (name (format-name ',name))
                                 (spells ,spells))))))
+
+(defmacro gen-combat-roll (sta-cost &rest rolls)
+  `(if (>= (- (rpg-character-cur-sta user) ,sta-cost) 0)
+     (let* ((rolls (list ,@rolls))
+            (roll-damage (max 0 (apply #'+ (mapcar #'first rolls)))))
+       (decf (rpg-character-cur-sta user) ,sta-cost)
+       (damage target roll-damage)
+       (list roll-damage (format nil "~{~A~^ + ~} = ~A" (mapcar #'second rolls) roll-damage) (format nil "~{~A~^ + ~}" (mapcar #'third rolls))))
+     nil))
