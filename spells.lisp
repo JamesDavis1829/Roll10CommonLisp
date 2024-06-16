@@ -1,6 +1,6 @@
 (load "utilities.lisp")
 (load "character.lisp")
-(defparameter *spells* nil)
+(defparameter *spells* ())
 
 (defstruct spell
   name

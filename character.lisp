@@ -1,5 +1,10 @@
 (load "utilities.lisp")
 (load "dice.lisp")
+(load "actions.lisp")
+(load "items.lisp")
+(load "spells.lisp")
+
+(defparameter *rpg-characters* ())
 
 (defstruct rpg-character
   (agility *base-stat*)
@@ -68,7 +73,16 @@
          (total-armor (apply '+ armor-values)))
     (list total-armor (write-to-string total-armor) "ARMOR")))
 
-(defmacro define-rpg-character (name level agi int sta str dur ins &key actions equipment feats inventory spells caster-type)
+(defmacro gen-combat-roll (sta-cost &rest rolls)
+  `(if (>= (- (rpg-character-cur-sta user) ,sta-cost) 0)
+     (let* ((rolls (list ,@rolls))
+            (roll-damage (max 0 (apply #'+ (mapcar #'first rolls)))))
+       (decf (rpg-character-cur-sta user) ,sta-cost)
+       (damage target roll-damage)
+       (list roll-damage (format nil "~{~A~^ + ~} = ~A" (mapcar #'second rolls) roll-damage) (format nil "~{~A~^ + ~}" (mapcar #'third rolls))))
+     nil))
+
+(defmacro define-rpg-character (name level caster-type agi int sta str dur ins &key (actions ()) (equipment ()) (feats ()) (inventory ()) (spells ()))
   (progn
    `(defstruct (,name (:include rpg-character
                                 (agility ,agi)
@@ -79,7 +93,8 @@
                                 (insight ,ins)
                                 (cur-hp ,dur)
                                 (cur-sta ,sta)
-                                (actions ,actions)
+                                (actions
+                                 (concatenate 'list ,actions (remove-if-not (lambda (act) (action-apply-to-all act)) *actions*)))
                                 (caster-type ,caster-type)
                                 (equipment ,equipment)
                                 (feats ,feats)
@@ -88,11 +103,4 @@
                                 (name (format-name ',name))
                                 (spells ,spells))))))
 
-(defmacro gen-combat-roll (sta-cost &rest rolls)
-  `(if (>= (- (rpg-character-cur-sta user) ,sta-cost) 0)
-     (let* ((rolls (list ,@rolls))
-            (roll-damage (max 0 (apply #'+ (mapcar #'first rolls)))))
-       (decf (rpg-character-cur-sta user) ,sta-cost)
-       (damage target roll-damage)
-       (list roll-damage (format nil "~{~A~^ + ~} = ~A" (mapcar #'second rolls) roll-damage) (format nil "~{~A~^ + ~}" (mapcar #'third rolls))))
-     nil))
+(define-rpg-character golem 2 "none" 10 6 19 13 19 10 :actions (list (make-unarmed-attack)) :equipment (list (make-natural-armor)))

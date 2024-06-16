@@ -1,6 +1,6 @@
 (load "utilities.lisp")
 (load "character.lisp")
-(defparameter *actions* nil)
+(defparameter *actions* ())
 
 (defstruct action
   situation
@@ -48,7 +48,7 @@
 (define-action study "combat" "As an action study the characteristics of a creature in combat. Add your Int and Ins modifiers to your next attack against that creature." "standard" nil nil
   (gen-combat-roll 0 (int-mod user) (ins-mod user)))
 
-(define-action arcane-shield "combat" "A spheroid of arcane energy manifests around the caster protecting them from harm." "reaction" nil t
+(define-action arcane-shield "combat" "A spheroid of arcane energy manifests around the caster protecting them from harm." "reaction" nil nil
   (gen-combat-roll 1 (roll-die 1 10) (int-mod user)))
 
 (define-action submission "combat" "While grappling a creature attempt to break it's bones or crush an organ. If successful the targets hp pool is reduced by 5 until magically healed or 6 weeks elapses." "attack" t nil
@@ -56,3 +56,6 @@
 
 (define-action choke "combat" "Attempt to prevent a creature from breathing. Creatures who do not breath are immune. If successful the creature cannot rest on their next turn." "attack" t nil
   (gen-combat-roll 4 (roll-die 1 10) (str-mod user) (agi-mod user)))
+
+(define-action unarmed-attack "combat" "Punch with your fists or other natural weapons." "attack" nil nil
+  (gen-combat-roll 1 (roll-die 1 10) (str-mod user) (agi-mod user)))

@@ -1,6 +1,6 @@
 (load "utilities.lisp")
 (load "character.lisp")
-(defparameter *items* nil)
+(defparameter *items* ())
 
 (defstruct item
   agility-requirement
@@ -82,10 +82,10 @@
   (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 8) (str-mod user) (agi-mod user)))
 
 (define-item whip 11 9 8 3 "light" 1 "weapon"
-  (gen-combat-roll 1 (roll 1 10) (roll 1 4) (agi-mod user)))
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 4) (agi-mod user)))
 
 (define-item short-spear 9 6 9 1 "medium" 1 "weapon"
-  (gen-combat-roll 1 (roll 1 10) (roll 1 6) (str-mod user)))
+  (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 6) (str-mod user)))
 
 (define-item spear 9 6 9 2 "medium" 2 "weapon"
   (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 8) (str-mod user) (agi-mod user)))
