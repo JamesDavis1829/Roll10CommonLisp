@@ -35,7 +35,7 @@
 
 (define-action compose "combat" "Rest and regains stamina." "standard" nil t
   (setf (rpg-character-cur-sta user) (min (rpg-character-stamina user) (+ 2 (rpg-character-cur-sta user))))
-  (const 2))
+  (const 0))
 
 (define-action taunt "combat" "As a reaction expend one stamina to add your int mod to the defense roll of another creature." "standard" nil nil
   (gen-combat-roll 1 (int-mod user)))

@@ -44,10 +44,10 @@
                                       (wield ,wield))))
     (defmethod perform-action ((user rpg-character) (target rpg-character) (item ,item-name))
       ,@body)
-    (pushnew ',item-name *items*)))
+    (pushnew (make-instance-from-name ',item-name) *items* :test (lambda (x y) (equal (item-name x) (item-name y))))))
 
 (defun random-item ()
-  (make-instance-from-name (nth (random (length *items*)) *items*)))
+  (nth (random (length *items*)) *items*))
 
 (define-item dagger 6 6 6 1 "light" 1 "weapon"
   (gen-combat-roll 1 (roll-die 1 10) (roll-die 1 6) (agi-mod user)))

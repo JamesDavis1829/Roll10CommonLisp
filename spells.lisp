@@ -56,10 +56,10 @@
   (gen-combat-roll (- 5 (first (caster-mod user))) (roll-die 3 8) (int-mod user)))
 
 (define-spell multiplicity 10 12 3 0 "arcane" 1 "An exact copy of the bard is created in a space they can see within range. Additional copies may be created by paying the stamina cost again. The caster may speak through the duplicates and move them on the casters turn. Each duplicate has 1 dur and 1 sta. The caster must expend 1 stamina per turn per duplicate or the duplicates vanish."
-  (gen-combat-roll (- 2 (first (caster-mod user)) (const 0))))
+  (gen-combat-roll (- 2 (first (caster-mod user))) (const 0)))
 
 (define-spell insult-to-injury 11 11 20 0 "arcane" 0 "The caster targets a creature which they believe can hear them. If the target cannot hear them the spell fails: The target makes an opposed skill check using int or ins. If the target fails the check they take 1 hp damage."
-  (gen-combat-roll (- 2 (first (caster-mod user)) (roll-die 1 10) (int-mod user))))
+  (gen-combat-roll (- 2 (first (caster-mod user))) (roll-die 1 10) (int-mod user)))
 
 (define-spell greater-heal 14 10 1 0 "divine" 2 "The caster targets a creature which they believe can hear them. If the target cannot hear them the spell fails: The target makes an opposed skill check using int or ins. If the target fails the check they take 1 hp damage."
   (let ((stamina-cost (- 7 (first (caster-mod user)))))

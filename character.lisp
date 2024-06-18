@@ -27,14 +27,23 @@
                                 (level ,level)
                                 (name (format-name ',name))
                                 (spells ,spells))))
-   (pushnew (make-instance-from-name ',name) *rpg-characters* :test (lambda (x y) (equal (rpg-character-name x) (rpg-character-name y))))))
+   (pushnew ',name *rpg-characters*)))
 
 (defun character-action-p (action)
   (cond
-    ((item-p action) t)
+    ((item-p action) (not (equal (item-category action) "armor")))
     ((spell-p action) t)
     ((action-p action) (not (equal "reaction" (action-type action))))
     (t nil)))
+
+(defmethod get-actions ((c rpg-character))
+  (let* ((equipment-actions (remove-if-not #'character-action-p (rpg-character-equipment c)))
+         (spell-actions (remove-if-not #'character-action-p (rpg-character-spells c)))
+         (action-actions (remove-if-not #'character-action-p (rpg-character-actions c))))
+    (concatenate 'list equipment-actions spell-actions action-actions)))
+
+(defun random-character ()
+  (make-instance-from-name (nth (random (length *rpg-characters*)) *rpg-characters*)))
 
 (define-rpg-character golem 2 "none" 10 6 19 13 19 10
   :actions (list (make-unarmed-attack))
