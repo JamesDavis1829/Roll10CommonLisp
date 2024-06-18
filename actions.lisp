@@ -27,7 +27,7 @@
 (define-action defend "combat" "Take the defend action." "reaction" t t
   (gen-combat-roll 1 (roll-die 1 10) (armor-mod user) (agi-mod user)))
 
-(define-action initiative "combat" "Roll for turn order." "standard" t t
+(define-action initiative "standard" "Roll for turn order." "standard" t t
   (gen-combat-roll 0 (roll-die 1 10) (agi-mod user)))
 
 (define-action dash "combat" "Take another move action." "standard" nil t

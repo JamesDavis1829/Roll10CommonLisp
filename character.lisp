@@ -69,7 +69,7 @@
   :spells (list (make-arcane-compose) (make-fireball)))
 
 (define-rpg-character slinky-automata 0 "none" 13 6 10 13 2 10
-  :equipment (list (make-unarmed-attack)))
+  :actions (list (make-unarmed-attack)))
 
 (define-rpg-character human-rogue-l2 2 "none" 11 10 13 10 10 10
   :equipment (list (make-chain-shirt) (make-dagger))

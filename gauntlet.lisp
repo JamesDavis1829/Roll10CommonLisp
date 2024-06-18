@@ -43,7 +43,9 @@
             (choose))))
 
 (defun print-results (user target action result &key is-ai)
-  (if (equal "Compose" (get-action-name action))
+  (if (or
+       (equal "Compose" (get-action-name action))
+       (equal "Arcane Compose" (get-action-name action)))
     (format t "~&~:[You~;NPC~] used ~A. They have ~A STA and ~A HP remaining."
             is-ai
             (get-action-name action)
@@ -58,9 +60,21 @@
             (rpg-character-cur-sta target)
             (rpg-character-cur-hp target))))
 
+(defun roll-defence (opponent result)
+  (if (and result
+           (> (first result) 0)
+           (> (rpg-character-cur-sta opponent) 0))
+    (let ((defense-roll (perform-action opponent (make-rpg-character) (make-defend))))
+      (format t "~%~A defended for ~A (~A)." (rpg-character-name opponent) (first defense-roll) (second defense-roll))
+      defense-roll)
+    '(0 "0" "0")))
+
 (defun perform-player-action (player opponent)
   (let* ((action (choose-action player))
-         (result (perform-action player opponent action)))
+         (result (or (perform-action player opponent action) '(0 "0" "0")))
+         (defense-roll (roll-defence opponent result)))
+    (setf (first result) (max 0 (- (first result) (first defense-roll))))
+    (damage opponent (first result))
     (print-results player opponent action result)))
 
 
@@ -85,7 +99,10 @@
 
 (defun perform-ai-action (ai opponent)
   (let* ((action (choose-ai-action ai opponent))
-         (result (perform-action ai opponent action)))
+         (result (perform-action ai opponent action))
+         (defense-roll (roll-defence opponent result)))
+    (setf (first result) (max 0 (- (first result) (first defense-roll))))
+    (damage opponent (first result))
     (print-results ai opponent action result :is-ai t)))
 
 
@@ -104,6 +121,11 @@
             (battle player next-opponent rest-opponents))
            (format t "~&You have defeated all your opponents. You are victorious."))))
       (t
+       (format t "~%You have (~A/~A) STA and (~A/~A) HP remaining."
+               (rpg-character-cur-sta player)
+               (rpg-character-stamina player)
+               (rpg-character-cur-hp player)
+               (rpg-character-durability player))
        (perform-player-action player opponent)
        (when (not (= (rpg-character-cur-hp opponent) 0))
          (perform-ai-action opponent player))

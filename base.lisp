@@ -26,7 +26,7 @@
      (let* ((rolls (list ,@rolls))
             (roll-damage (max 0 (apply #'+ (mapcar #'first rolls)))))
        (decf (rpg-character-cur-sta user) ,sta-cost)
-       (damage target roll-damage)
+       ;(damage target roll-damage)
        (list roll-damage (format nil "~{~A~^ + ~} = ~A" (mapcar #'second rolls) roll-damage) (format nil "~{~A~^ + ~}" (mapcar #'third rolls))))
      nil))
 
