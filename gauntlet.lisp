@@ -46,9 +46,10 @@
   (if (or
        (equal "Compose" (get-action-name action))
        (equal "Arcane Compose" (get-action-name action)))
-    (format t "~&~:[You~;NPC~] used ~A. They have ~A STA and ~A HP remaining."
+    (format t "~&~:[You~;NPC~] used ~A. ~:[You~;They~] have ~A STA and ~A HP remaining."
             is-ai
             (get-action-name action)
+            is-ai
             (rpg-character-cur-sta user)
             (rpg-character-cur-hp user))
     (format t "~&~:[You~;NPC~] hit the ~A for ~A (~A) damage with a ~a. They have ~A STA and ~A HP remaining."
