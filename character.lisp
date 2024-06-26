@@ -1,10 +1,3 @@
-(load "utilities.lisp")
-(load "base.lisp")
-(load "dice.lisp")
-(load "items.lisp")
-(load "actions.lisp")
-(load "spells.lisp")
-
 (defparameter *rpg-characters* ())
 
 (defmacro define-rpg-character (name level caster-type agi int sta str dur ins &key (actions ()) (equipment ()) (feats ()) (inventory ()) (spells ()))

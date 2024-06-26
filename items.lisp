@@ -34,23 +34,20 @@
     (push (rpg-character-inventory user) item)))
 
 (defmacro define-item (item-name agi-req int-req str-req range weight wield category &body body)
-  (let ((function-name (read-from-string (format nil "make-~a" item-name))))
-  `(progn
-    (defun ,function-name ()
-      (make-item
-       :agility-requirement ,agi-req
-       :intelligence-requirement ,int-req
-       :strength-requirement ,str-req
-       :category ,category
-       :name (format-name ',item-name)
-       :range ,range
-       :weight ,weight
-       :wield ,wield
-       :roll-function (lambda (user target)
-                              (declare (ignorable user))
-                              (declare (ignorable target))
-                              ,@body)))
-    (pushnew (,function-name) *items* :test (lambda (x y) (equal (item-name x) (item-name y)))))))
+  `(define-rollable ,item-name *items* item-name
+     (make-item
+      :agility-requirement ,agi-req
+      :intelligence-requirement ,int-req
+      :strength-requirement ,str-req
+      :category ,category
+      :name (format-name ',item-name)
+      :range ,range
+      :weight ,weight
+      :wield ,wield
+      :roll-function (lambda (user target)
+                             (declare (ignorable user))
+                             (declare (ignorable target))
+                             ,@body))))
 
 (defun random-item ()
   (nth (random (length *items*)) *items*))

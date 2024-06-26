@@ -10,28 +10,31 @@
   aoe
   school
   tier
-  description)
+  description
+  roll-function)
 
 (defmethod can-equip ((user rpg-character) (spell spell))
   (and (>= (rpg-character-insight user)      (spell-insight-requirement spell))
        (>= (rpg-character-intelligence user) (spell-intelligence-requirement spell))))
 
-(defmethod perform-action ((user rpg-character) (target rpg-character) (spell spell)))
+(defmethod perform-action ((user rpg-character) (target rpg-character) (spell spell))
+  (funcall (spell-roll-function spell) user target))
 
 (defmacro define-spell (name ins-req int-req range aoe school tier desc &body body)
-  `(progn
-    (defstruct (,name (:include spell
-                                (name (format-name ',name))
-                                (insight-requirement ,ins-req)
-                                (intelligence-requirement ,int-req)
-                                (range ,range)
-                                (aoe ,aoe)
-                                (school ,school)
-                                (tier ,tier)
-                                (description ,desc))))
-    (defmethod perform-action ((user rpg-character) (target rpg-character) (spell ,name))
-      ,@body)
-    (pushnew (make-instance-from-name ',name) *spells* :test (lambda (x y) (equal (spell-name x) (spell-name y))))))
+  `(define-rollable ,name *spells* spell-name
+     (make-spell
+      :name (format-name ',name)
+      :insight-requirement ,ins-req
+      :intelligence-requirement ,int-req
+      :range ,range
+      :aoe ,aoe
+      :school ,school
+      :tier ,tier
+      :description ,desc
+      :roll-function (lambda (user target)
+                             (declare (ignorable user))
+                             (declare (ignorable target))
+                             ,@body))))
 
 (define-spell chill-wind 8 12 20 3 "arcane" 1 "Stamina damage only. If this attack reduces stamina to 0 the targets next rest action restores half the normal stamina"
   (gen-combat-roll (- 6 (first (caster-mod user))) (roll-die 2 8) (int-mod user)))

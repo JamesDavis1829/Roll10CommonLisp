@@ -1,5 +1,3 @@
-(load "character.lisp")
-
 ;Pick one of the predefined characters (done)
 ;Then the system will randomly make a gauntlet of 5 other characters to fight (done)
 ;The battle ends when either characters hp reaches 0 (done)

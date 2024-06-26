@@ -16,21 +16,18 @@
   (funcall (action-roll-function usable-action) user target))
 
 (defmacro define-action (name situation description type include-base-dice apply-to-all &body body)
-  (let ((function-name (read-from-string (format nil "make-~a" name))))
-  `(progn
-    (defun ,function-name ()
-      (make-action
-       :name (format-name ',name)
-       :include-base-dice ,include-base-dice
-       :apply-to-all ,apply-to-all
-       :description ,description
-       :type ,type
-       :situation ,situation
-       :roll-function (lambda (user target)
-                              (declare (ignorable user))
-                              (declare (ignorable target))
-                              ,@body)))
-    (pushnew (,function-name) *actions* :test (lambda (x y) (equal (action-name x) (action-name y)))))))
+  `(define-rollable ,name *actions* action-name
+    (make-action
+     :name (format-name ',name)
+     :include-base-dice ,include-base-dice
+     :apply-to-all ,apply-to-all
+     :description ,description
+     :type ,type
+     :situation ,situation
+     :roll-function (lambda (user target)
+                            (declare (ignorable user))
+                            (declare (ignorable target))
+                            ,@body))))
 
 (define-action defend "combat" "Take the defend action." "reaction" t t
   (gen-combat-roll 1 (roll-die 1 10) (armor-mod user) (agi-mod user)))
