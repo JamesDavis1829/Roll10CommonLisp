@@ -1,5 +1,3 @@
-(load "utilities.lisp")
-(load "base.lisp")
 (defparameter *items* ())
 
 (defstruct item
@@ -11,7 +9,11 @@
   name
   range
   weight
-  wield)
+  wield
+  roll-function)
+
+(defmethod perform-action ((user rpg-character) (target rpg-character) (usable-item item))
+  (funcall (item-roll-function usable-item) user target))
 
 (defmethod armor-mod ((c rpg-character))
   (let* ((equiped-armor (remove-if-not (lambda (x) (equal (item-category x) "armor")) (rpg-character-equipment c)))
@@ -32,19 +34,23 @@
     (push (rpg-character-inventory user) item)))
 
 (defmacro define-item (item-name agi-req int-req str-req range weight wield category &body body)
+  (let ((function-name (read-from-string (format nil "make-~a" item-name))))
   `(progn
-    (defstruct (,item-name (:include item
-                                      (agility-requirement ,agi-req)
-                                      (intelligence-requirement ,int-req)
-                                      (strength-requirement ,str-req)
-                                      (category ,category)
-                                      (name (format-name ',item-name))
-                                      (range ,range)
-                                      (weight ,weight)
-                                      (wield ,wield))))
-    (defmethod perform-action ((user rpg-character) (target rpg-character) (item ,item-name))
-      ,@body)
-    (pushnew (make-instance-from-name ',item-name) *items* :test (lambda (x y) (equal (item-name x) (item-name y))))))
+    (defun ,function-name ()
+      (make-item
+       :agility-requirement ,agi-req
+       :intelligence-requirement ,int-req
+       :strength-requirement ,str-req
+       :category ,category
+       :name (format-name ',item-name)
+       :range ,range
+       :weight ,weight
+       :wield ,wield
+       :roll-function (lambda (user target)
+                              (declare (ignorable user))
+                              (declare (ignorable target))
+                              ,@body)))
+    (pushnew (,function-name) *items* :test (lambda (x y) (equal (item-name x) (item-name y)))))))
 
 (defun random-item ()
   (nth (random (length *items*)) *items*))
